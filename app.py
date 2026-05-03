@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from utils.docx_handler import extract_images_docx, replace_images_docx
 from utils.pptx_handler import extract_images_pptx, replace_images_pptx
 from utils.xlsx_handler import extract_images_xlsx, replace_images_xlsx
+from utils.template_creator import create_template
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024  # 50MB
@@ -85,6 +86,33 @@ def replace():
         as_attachment=True,
         download_name=f"rebranded_{session_id[:8]}.{ext}",
     )
+
+
+@app.route("/create", methods=["POST"])
+def create():
+    data = request.get_json()
+    prompt    = (data.get("prompt", "") or "").strip()
+    file_type = (data.get("file_type", "docx") or "docx").strip()
+
+    if not prompt:
+        return jsonify({"error": "Skriv en beskrivelse av malen"}), 400
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        return jsonify({"error": "ANTHROPIC_API_KEY mangler — legg til i Railway-miljøvariablene"}), 500
+
+    try:
+        file_bytes, ext = create_template(prompt, file_type)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": f"Feil under generering: {str(e)}"}), 500
+
+    out_id   = str(uuid.uuid4())
+    out_path = os.path.join(UPLOAD_FOLDER, f"{out_id}_new.{ext}")
+    with open(out_path, "wb") as f:
+        f.write(file_bytes)
+
+    safe_name = prompt[:40].replace(" ", "_").replace("/", "-")
+    return send_file(out_path, as_attachment=True, download_name=f"{safe_name}.{ext}")
 
 
 @app.route("/cleanup", methods=["POST"])
