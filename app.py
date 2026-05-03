@@ -76,14 +76,21 @@ def replace():
     data = request.form
     session_id = data.get("session_id")
     ext = data.get("ext")
-    selected = json.loads(data.get("selected", "[]"))
 
-    logo_file = request.files.get("logo")
-    if not logo_file:
-        return jsonify({"error": "Ingen logo lastet opp"}), 400
+    # Mapping: image_id → form-field-name (e.g. "rId17" → "logo_0")
+    mapping = json.loads(data.get("mapping", "{}"))
+    if not mapping:
+        return jsonify({"error": "Ingen erstatninger valgt"}), 400
 
-    logo_bytes = logo_file.read()
-    logo_ext = logo_file.filename.rsplit(".", 1)[-1].lower() if "." in logo_file.filename else "png"
+    # Build replacements: image_id → bytes
+    replacements = {}
+    for img_id, field_name in mapping.items():
+        f = request.files.get(field_name)
+        if f:
+            replacements[img_id] = f.read()
+
+    if not replacements:
+        return jsonify({"error": "Ingen erstatningsbilder mottatt"}), 400
 
     src_path = os.path.join(UPLOAD_FOLDER, f"{session_id}.{ext}")
     if not os.path.exists(src_path):
@@ -94,7 +101,7 @@ def replace():
 
     _, replace_fn = get_handler(ext)
     try:
-        replace_fn(src_path, out_path, selected, logo_bytes, logo_ext)
+        replace_fn(src_path, out_path, replacements)
     except Exception as e:
         return jsonify({"error": f"Feil under bildebytte: {str(e)}"}), 500
 
