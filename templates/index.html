@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Template Rebrand — Crayon → SoftwareOne</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f6fb;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #003087;
+      color: #fff;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header h1 { font-size: 1.25rem; font-weight: 600; }
+    header span { font-size: 0.85rem; opacity: 0.75; }
+
+    .badge {
+      background: #00a3e0;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    main {
+      max-width: 860px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .card h2 { font-size: 1rem; font-weight: 600; margin-bottom: 18px; color: #003087; }
+
+    .step-badge {
+      display: inline-block;
+      background: #003087;
+      color: #fff;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 24px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    .drop-zone {
+      border: 2px dashed #c0ccdf;
+      border-radius: 10px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: #f8faff;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: #003087;
+      background: #eef3ff;
+    }
+    .drop-zone input { display: none; }
+    .drop-zone p { color: #555; font-size: 0.9rem; }
+    .drop-zone .hint { font-size: 0.78rem; color: #999; margin-top: 6px; }
+    .drop-zone .file-name { font-weight: 600; color: #003087; margin-top: 8px; font-size: 0.95rem; }
+
+    .btn {
+      display: inline-block;
+      padding: 11px 28px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn-primary { background: #003087; color: #fff; }
+    .btn-success { background: #00a36c; color: #fff; }
+    .btn-secondary { background: #e8edf7; color: #003087; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    #extract-btn { margin-top: 16px; }
+
+    .images-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .img-card {
+      border: 2px solid #e0e6f0;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      background: #fafbff;
+    }
+    .img-card:hover { border-color: #003087; }
+    .img-card.selected {
+      border-color: #003087;
+      box-shadow: 0 0 0 3px rgba(0,48,135,0.15);
+    }
+    .img-card.selected .img-check { background: #003087; }
+    .img-card.selected .img-check::after { display: block; }
+
+    .img-preview {
+      width: 100%;
+      height: 110px;
+      object-fit: contain;
+      padding: 8px;
+      background: #fff;
+    }
+
+    .img-footer {
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-top: 1px solid #e0e6f0;
+    }
+
+    .img-check {
+      width: 18px; height: 18px;
+      border-radius: 4px;
+      border: 2px solid #c0ccdf;
+      background: #fff;
+      flex-shrink: 0;
+      position: relative;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .img-check::after {
+      content: '';
+      display: none;
+      position: absolute;
+      left: 4px; top: 1px;
+      width: 6px; height: 10px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
+    }
+
+    .img-label { font-size: 0.72rem; color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .select-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+    .select-bar span { font-size: 0.82rem; color: #888; margin-left: auto; }
+
+    .logo-upload {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    #logo-preview-wrap {
+      display: none;
+      align-items: center;
+      gap: 12px;
+    }
+    #logo-preview {
+      max-width: 120px;
+      max-height: 60px;
+      object-fit: contain;
+      border: 1px solid #e0e6f0;
+      border-radius: 6px;
+      padding: 4px;
+      background: #fff;
+    }
+
+    .alert {
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      margin-bottom: 16px;
+    }
+    .alert-info { background: #e8f4ff; color: #0056b3; border-left: 3px solid #0056b3; }
+    .alert-success { background: #e6f9f0; color: #007a50; border-left: 3px solid #00a36c; }
+    .alert-error { background: #fff0f0; color: #c0392b; border-left: 3px solid #e74c3c; }
+
+    #status-area { min-height: 0; }
+
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #step2, #step3 { display: none; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Template Rebrand</h1>
+    <span>Bytt logo og bilder i Office-maler</span>
+  </div>
+  <div class="badge">Crayon → SoftwareOne</div>
+</header>
+
+<main>
+  <div id="status-area"></div>
+
+  <!-- STEG 1: Last opp mal -->
+  <div class="card" id="step1">
+    <h2><span class="step-badge">1</span>Last opp Office-malen</h2>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <input type="file" id="file-input" accept=".docx,.pptx,.xlsx,.xlsm,.xltx,.potx" />
+      <p>Klikk eller dra filen hit</p>
+      <p class="hint">Støttede formater: .docx &nbsp;·&nbsp; .pptx &nbsp;·&nbsp; .xlsx &nbsp;·&nbsp; .xlsm &nbsp;·&nbsp; .potx</p>
+      <p class="file-name hidden" id="file-name-display"></p>
+    </div>
+    <button class="btn btn-primary" id="extract-btn" disabled onclick="extractImages()">
+      Analyser bilder i filen
+    </button>
+  </div>
+
+  <!-- STEG 2: Velg bilder -->
+  <div class="card" id="step2">
+    <h2><span class="step-badge">2</span>Velg bilder som skal byttes</h2>
+    <div class="select-bar">
+      <button class="btn btn-secondary" style="padding:6px 14px;font-size:0.82rem" onclick="selectAll()">Velg alle</button>
+      <button class="btn btn-secondary" style="padding:6px 14px;font-size:0.82rem" onclick="selectNone()">Fjern alle</button>
+      <span id="selected-count">0 valgt</span>
+    </div>
+    <div class="images-grid" id="images-grid"></div>
+  </div>
+
+  <!-- STEG 3: Last opp ny logo og generer -->
+  <div class="card" id="step3">
+    <h2><span class="step-badge">3</span>Last opp SoftwareOne-logo og generer</h2>
+    <div class="logo-upload">
+      <button class="btn btn-secondary" onclick="document.getElementById('logo-input').click()">
+        Velg logo-fil
+      </button>
+      <input type="file" id="logo-input" style="display:none" accept="image/*" onchange="previewLogo(this)" />
+      <div id="logo-preview-wrap">
+        <img id="logo-preview" src="" alt="Logo forhåndsvisning" />
+        <span id="logo-name" style="font-size:0.82rem;color:#555"></span>
+      </div>
+    </div>
+    <button class="btn btn-success" id="replace-btn" style="margin-top:20px" disabled onclick="doReplace()">
+      Generer rebrandet fil
+    </button>
+  </div>
+</main>
+
+<script>
+  let sessionId = null;
+  let fileExt = null;
+  let allImages = [];
+  let selectedIds = new Set();
+
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) setFile(file);
+  });
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) setFile(fileInput.files[0]); });
+
+  function setFile(file) {
+    const allowed = ['docx','pptx','xlsx','xlsm','xltx','potx'];
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!allowed.includes(ext)) {
+      showStatus('Ugyldig filtype. Bruk .docx, .pptx eller .xlsx.', 'error');
+      return;
+    }
+    const nameEl = document.getElementById('file-name-display');
+    nameEl.textContent = file.name;
+    nameEl.classList.remove('hidden');
+    document.getElementById('extract-btn').disabled = false;
+    fileInput._file = file;
+    clearStatus();
+  }
+
+  function showStatus(msg, type = 'info') {
+    document.getElementById('status-area').innerHTML =
+      `<div class="alert alert-${type}">${msg}</div>`;
+  }
+  function clearStatus() {
+    document.getElementById('status-area').innerHTML = '';
+  }
+
+  async function extractImages() {
+    const file = fileInput._file || fileInput.files[0];
+    if (!file) return;
+
+    const btn = document.getElementById('extract-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Analyserer…';
+
+    const fd = new FormData();
+    fd.append('file', file);
+
+    try {
+      const res = await fetch('/extract', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.error) { showStatus(data.error, 'error'); btn.disabled = false; btn.textContent = 'Analyser bilder i filen'; return; }
+
+      sessionId = data.session_id;
+      fileExt = data.ext;
+      allImages = data.images;
+
+      if (allImages.length === 0) {
+        showStatus('Ingen bilder funnet i filen.', 'info');
+        btn.disabled = false;
+        btn.textContent = 'Analyser bilder i filen';
+        return;
+      }
+
+      renderImages(allImages);
+      document.getElementById('step2').style.display = 'block';
+      document.getElementById('step3').style.display = 'block';
+      document.getElementById('step2').scrollIntoView({ behavior: 'smooth' });
+
+      btn.textContent = 'Analyser bilder i filen';
+      clearStatus();
+    } catch (e) {
+      showStatus('Noe gikk galt. Prøv igjen.', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Analyser bilder i filen';
+    }
+  }
+
+  function renderImages(images) {
+    const grid = document.getElementById('images-grid');
+    grid.innerHTML = '';
+    selectedIds.clear();
+
+    images.forEach(img => {
+      const card = document.createElement('div');
+      card.className = 'img-card';
+      card.dataset.id = img.id;
+      card.innerHTML = `
+        <img class="img-preview" src="data:${img.content_type};base64,${img.data}" alt="" />
+        <div class="img-footer">
+          <div class="img-check"></div>
+          <span class="img-label">.${img.ext}</span>
+        </div>`;
+      card.addEventListener('click', () => toggleImage(img.id, card));
+      grid.appendChild(card);
+    });
+
+    updateCount();
+  }
+
+  function toggleImage(id, card) {
+    if (selectedIds.has(id)) {
+      selectedIds.delete(id);
+      card.classList.remove('selected');
+    } else {
+      selectedIds.add(id);
+      card.classList.add('selected');
+    }
+    updateCount();
+    updateReplaceBtn();
+  }
+
+  function selectAll() {
+    document.querySelectorAll('.img-card').forEach(card => {
+      selectedIds.add(card.dataset.id);
+      card.classList.add('selected');
+    });
+    updateCount(); updateReplaceBtn();
+  }
+
+  function selectNone() {
+    selectedIds.clear();
+    document.querySelectorAll('.img-card').forEach(card => card.classList.remove('selected'));
+    updateCount(); updateReplaceBtn();
+  }
+
+  function updateCount() {
+    document.getElementById('selected-count').textContent = `${selectedIds.size} valgt`;
+  }
+
+  function updateReplaceBtn() {
+    const logoReady = !!document.getElementById('logo-input').files[0];
+    document.getElementById('replace-btn').disabled = !(selectedIds.size > 0 && logoReady);
+  }
+
+  function previewLogo(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const wrap = document.getElementById('logo-preview-wrap');
+      wrap.style.display = 'flex';
+      document.getElementById('logo-preview').src = e.target.result;
+      document.getElementById('logo-name').textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+    updateReplaceBtn();
+  }
+
+  async function doReplace() {
+    if (!sessionId || selectedIds.size === 0) return;
+    const logoFile = document.getElementById('logo-input').files[0];
+    if (!logoFile) return;
+
+    const btn = document.getElementById('replace-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Genererer…';
+
+    const fd = new FormData();
+    fd.append('session_id', sessionId);
+    fd.append('ext', fileExt);
+    fd.append('selected', JSON.stringify([...selectedIds]));
+    fd.append('logo', logoFile);
+
+    try {
+      const res = await fetch('/replace', { method: 'POST', body: fd });
+      if (!res.ok) {
+        const err = await res.json();
+        showStatus(err.error || 'Feil under generering.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Generer rebrandet fil';
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const origName = (fileInput._file || fileInput.files[0]).name.replace(/\.(\w+)$/, `_rebranded.$1`);
+      a.href = url;
+      a.download = origName;
+      a.click();
+      URL.revokeObjectURL(url);
+      showStatus(`Ferdig! <strong>${origName}</strong> er lastet ned.`, 'success');
+      btn.textContent = 'Generer rebrandet fil';
+      btn.disabled = false;
+
+      fetch('/cleanup', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({session_id: sessionId}) });
+    } catch (e) {
+      showStatus('Noe gikk galt. Prøv igjen.', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Generer rebrandet fil';
+    }
+  }
+</script>
+</body>
+</html>
