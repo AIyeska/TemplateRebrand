@@ -418,7 +418,8 @@
     const fd = new FormData(); fd.append('file', file);
     try {
       const res = await fetch('/extract', { method: 'POST', body: fd });
-      const data = await res.json();
+      let data;
+      try { data = await res.json(); } catch { showStatus(`Serverfeil (${res.status}) — sjekk at appen kjører.`, 'error'); resetBtn(btn, 'Analyser bilder i filen'); return; }
       if (data.error) { showStatus(data.error, 'error'); resetBtn(btn, 'Analyser bilder i filen'); return; }
       sessionId = data.session_id; fileExt = data.ext;
       if (!data.images.length) { showStatus('Ingen bilder funnet i filen.', 'info'); resetBtn(btn, 'Analyser bilder i filen'); return; }
@@ -426,7 +427,7 @@
       ['step2','step3'].forEach(id => document.getElementById(id).style.display = 'block');
       document.getElementById('step2').scrollIntoView({ behavior: 'smooth' });
       resetBtn(btn, 'Analyser bilder i filen'); clearStatus();
-    } catch { showStatus('Noe gikk galt. Prøv igjen.', 'error'); resetBtn(btn, 'Analyser bilder i filen'); }
+    } catch (err) { showStatus(`Tilkoblingsfeil — er Flask-serveren startet? (${err.message})`, 'error'); resetBtn(btn, 'Analyser bilder i filen'); }
   }
 
   function resetBtn(btn, label) { btn.disabled = false; btn.textContent = label; }

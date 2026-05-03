@@ -41,8 +41,10 @@ def index():
 @app.route("/extract", methods=["POST"])
 def extract():
     file = request.files.get("file")
-    if not file or not allowed_file(file.filename):
-        return jsonify({"error": "Ugyldig filtype"}), 400
+    if not file or not file.filename:
+        return jsonify({"error": "Ingen fil mottatt"}), 400
+    if not allowed_file(file.filename):
+        return jsonify({"error": f"Filtypen støttes ikke. Bruk: {', '.join(ALLOWED_EXTENSIONS)}"}), 400
 
     ext = file.filename.rsplit(".", 1)[1].lower()
     session_id = str(uuid.uuid4())
@@ -53,7 +55,11 @@ def extract():
     if not extract_fn:
         return jsonify({"error": "Ikke støttet filtype"}), 400
 
-    images = extract_fn(save_path)
+    try:
+        images = extract_fn(save_path)
+    except Exception as e:
+        return jsonify({"error": f"Kunne ikke lese filen: {str(e)}"}), 500
+
     return jsonify({"session_id": session_id, "ext": ext, "images": images})
 
 
@@ -79,7 +85,10 @@ def replace():
     out_path = os.path.join(UPLOAD_FOLDER, f"{out_id}_rebranded.{ext}")
 
     _, replace_fn = get_handler(ext)
-    replace_fn(src_path, out_path, selected, logo_bytes, logo_ext)
+    try:
+        replace_fn(src_path, out_path, selected, logo_bytes, logo_ext)
+    except Exception as e:
+        return jsonify({"error": f"Feil under bildebytte: {str(e)}"}), 500
 
     return send_file(
         out_path,
