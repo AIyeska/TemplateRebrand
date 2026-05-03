@@ -25,34 +25,65 @@
     html, body { background: var(--dark); color: var(--text); font-family: 'Segoe UI', -apple-system, Arial, sans-serif; min-height: 100vh; }
 
     /* ── HEADER ── */
-    header { position: relative; overflow: hidden; background: var(--dark2); border-bottom: 1px solid var(--border); }
+    header {
+      position: relative; overflow: hidden;
+      background: var(--dark2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-bg {
+      position: absolute; inset: 0;
+      background-image: url('https://images.pexels.com/photos/290470/pexels-photo-290470.jpeg?auto=compress&cs=tinysrgb&w=1400');
+      background-size: cover; background-position: center 55%;
+      opacity: 0.38;
+      filter: saturate(1.4) brightness(0.9);
+    }
+
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(to right, rgba(8,12,20,0.92) 0%, rgba(8,12,20,0.55) 55%, rgba(8,12,20,0.35) 100%),
+        linear-gradient(to top,   rgba(8,12,20,0.85) 0%, transparent 50%);
+    }
+
     .hero {
-      position: relative; padding: 48px 48px 40px;
+      position: relative; z-index: 2;
+      padding: 44px 48px 38px;
       display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap;
     }
-    .hero::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 70% 110%, rgba(0,229,255,0.12) 0%, transparent 60%),
-                  radial-gradient(ellipse 50% 40% at 85% 120%, rgba(255,106,0,0.10) 0%, transparent 50%),
-                  radial-gradient(ellipse 40% 30% at 55% 130%, rgba(255,45,85,0.08) 0%, transparent 50%);
-      pointer-events: none;
-    }
+
     .glow-line {
-      position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent 0%, var(--red) 15%, var(--orange) 35%, var(--cyan) 65%, transparent 100%);
-      opacity: 0.7;
+      position: absolute; bottom: 0; left: 0; right: 0; height: 3px; z-index: 3;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        var(--red) 12%,
+        var(--orange) 30%,
+        #ffcc00 42%,
+        var(--cyan) 62%,
+        transparent 100%);
+      opacity: 0.85;
+      filter: blur(0.5px);
     }
-    .logo-area { display: flex; flex-direction: column; gap: 4px; z-index: 1; }
-    .swo-logo { display: flex; align-items: center; gap: 14px; }
-    .swo-badge { display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; background: var(--white); flex-shrink: 0; }
-    .swo-badge svg { width: 32px; height: 32px; }
-    .swo-wordmark .small { font-size: 0.7rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
-    .swo-wordmark .big   { font-size: 2rem; font-weight: 800; color: var(--white); letter-spacing: -0.5px; }
-    .hero-sub { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+
+    .logo-area { display: flex; flex-direction: column; gap: 6px; z-index: 2; }
+
+    .swo-logo-img {
+      height: 44px;
+      width: auto;
+      filter: drop-shadow(0 2px 12px rgba(0,0,0,0.5));
+    }
+
+    .hero-sub {
+      font-size: 0.82rem; color: rgba(255,255,255,0.55);
+      letter-spacing: 0.03em; margin-top: 2px;
+    }
+
     .rebrand-badge {
-      z-index: 1; display: flex; align-items: center; gap: 10px;
-      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-      border-radius: 12px; padding: 12px 20px; font-size: 0.8rem; color: var(--muted);
+      z-index: 2; display: flex; align-items: center; gap: 10px;
+      background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px; padding: 12px 20px; font-size: 0.82rem;
+      color: rgba(255,255,255,0.6);
+      backdrop-filter: blur(8px);
     }
     .rebrand-badge strong { color: var(--white); }
     .arrow-icon { color: var(--cyan); font-size: 1.1rem; }
@@ -219,21 +250,12 @@
 
 <!-- HEADER -->
 <header>
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
   <div class="hero">
     <div class="logo-area">
-      <div class="swo-logo">
-        <div class="swo-badge">
-          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="50" cy="50" r="48" fill="#003087"/>
-            <text x="50" y="68" text-anchor="middle" font-family="Arial" font-weight="900" font-size="52" fill="white">S</text>
-          </svg>
-        </div>
-        <div class="swo-wordmark">
-          <div class="small">software</div>
-          <div class="big">one</div>
-        </div>
-      </div>
-      <div class="hero-sub">Template Manager · Rebrand &amp; Lag nye Office-maler</div>
+      <img src="/static/swo_logo_white.svg" alt="SoftwareOne" class="swo-logo-img" />
+      <div class="hero-sub">Template Manager &nbsp;·&nbsp; Rebrand &amp; Lag nye Office-maler</div>
     </div>
     <div class="rebrand-badge">
       <strong>Crayon</strong>
