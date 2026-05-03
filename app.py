@@ -12,6 +12,14 @@ from utils.template_creator import create_template
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024  # 50MB
 
+@app.errorhandler(Exception)
+def handle_exception(e):
+    return jsonify({"error": str(e)}), 500
+
+@app.errorhandler(413)
+def too_large(e):
+    return jsonify({"error": "Filen er for stor (maks 50 MB)"}), 413
+
 UPLOAD_FOLDER = "temp_uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 

@@ -521,7 +521,12 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt, file_type: selectedFileType }),
       });
-      if (!res.ok) { const e = await res.json(); showStatus(e.error || 'Feil.', 'error', 'create-status'); resetBtn(btn, '✨  Generer mal med AI'); return; }
+      if (!res.ok) {
+        let msg = 'Serverfeil (' + res.status + ')';
+        try { const e = await res.json(); msg = e.error || msg; } catch(je) {}
+        showStatus(msg, 'error', 'create-status');
+        resetBtn(btn, document.getElementById('create-btn').dataset.label || 'Generer'); return;
+      }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -529,7 +534,7 @@
       a.href = url; a.download = name; a.click(); URL.revokeObjectURL(url);
       showStatus(`Ferdig! <strong>${name}</strong> er lastet ned med SoftwareOne-branding.`, 'success', 'create-status');
       resetBtn(btn, '✨  Generer mal med AI');
-    } catch { showStatus('Noe gikk galt. Prøv igjen.', 'error', 'create-status'); resetBtn(btn, '✨  Generer mal med AI'); }
+    } catch (err) { showStatus('Feil: ' + err.message, 'error', 'create-status'); resetBtn(btn, document.getElementById('create-btn').dataset.label || 'Generer'); }
   }
 </script>
 </body>
